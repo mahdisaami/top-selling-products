@@ -1,0 +1,39 @@
+services:
+  best_selling:
+    restart: always
+    build: .
+    container_name: best_selling_app
+    command: sh -c "python manage.py migrate && python manage.py crontab add && python manage.py runserver 0.0.0.0:8000"
+    env_file:
+      - .env
+    ports:
+        - "8000:8000"
+    volumes:
+      - .:/best_selling
+
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    restart: always
+    container_name: postgres_db
+    image: postgres:alpine
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+
+  redis:
+    restart: always
+    container_name: redis_cache
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+
+
+volumes:
+  postgres_data:
