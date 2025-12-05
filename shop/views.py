@@ -4,6 +4,8 @@ from django.core.cache import cache
 from shop.services.analytics import top_selling_products_last_month
 
 CACHE_KEY = "top_selling_last_month_v1"
+USERS_CACHE_KEY = "requested_users"
+
 
 class TopSellingProductsAPIView(APIView):
     """
@@ -12,6 +14,7 @@ class TopSellingProductsAPIView(APIView):
     """
     def get(self, request):
         data = cache.get(CACHE_KEY)
+        cache.client.get_client().sadd(USERS_CACHE_KEY, request.user.username)
         if data is not None:
             return Response({"cached": True, "results": data})
 
